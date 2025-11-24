@@ -5,3 +5,12 @@ ShootingStat
 ScoringStat
 DefenseStat
 This defines the value 
+Same thing we Can see as PlayerMetric With the Assists System
+This goes to
+Assists metric
+PointGuardAssists
+CenterAssits
+POLYMORPHISM METHODS
+rate() Which are used by
+Shootingstat
+ScoringStat
