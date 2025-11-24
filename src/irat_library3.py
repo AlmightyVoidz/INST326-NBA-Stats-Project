@@ -96,3 +96,158 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+#ASSISTS
+
+# src/player_metric.py
+from abc import ABC, abstractmethod
+
+class PlayerMetric(ABC):
+    """
+    Abstract base class for all NBA player metrics.
+    Defines a standard interface for evaluating statistical performance.
+    """
+
+    def __init__(self, player_name, value):
+        if not isinstance(player_name, str) or not player_name.strip():
+            raise ValueError("Player name must be a non-empty string.")
+
+        if not isinstance(value, (int, float)) or value < 0:
+            raise ValueError("Metric value must be a non-negative number.")
+
+        self._player_name = player_name
+        self._value = value
+
+    @property
+    def player_name(self):
+        return self._player_name
+
+    @property
+    def value(self):
+        return self._value
+
+    @abstractmethod
+    def evaluate(self):
+        """
+        Return a rating based on the metric value.
+        Subclasses must implement this.
+        """
+        pass
+
+    def __str__(self):
+        return f"{self.player_name}: {self.value}"
+
+# src/assists_metric.py
+from player_metric import PlayerMetric
+
+class AssistsMetric(PlayerMetric):
+    """
+    Base class for evaluating assists per game.
+    Applies a standard NBA scale.
+    """
+
+    def evaluate(self):
+        """General NBA assist rating."""
+        if self.value >= 10:
+            return ("Excellent", 5)
+        elif self.value >= 7:
+            return ("Good", 4)
+        elif self.value >= 5:
+            return ("OK", 3)
+        elif self.value >= 3:
+            return ("Bad", 2)
+        else:
+            return ("Terrible", 1)
+
+
+class PointGuardAssists(AssistsMetric):
+    """
+    Specialized metric: PGs are expected to have higher APG.
+    Overrides evaluate() for stricter grading.
+    """
+
+    def evaluate(self):
+        if self.value >= 11:
+            return ("Excellent", 5)
+        elif self.value >= 8:
+            return ("Good", 4)
+        elif self.value >= 6:
+            return ("OK", 3)
+        elif self.value >= 4:
+            return ("Bad", 2)
+        else:
+            return ("Terrible", 1)
+
+
+class CenterAssists(AssistsMetric):
+    """
+    Specialized metric: Centers are not expected to assist as much.
+    Overrides evaluate() for a more lenient scale.
+    """
+
+    def evaluate(self):
+        if self.value >= 6:
+            return ("Excellent", 5)
+        elif self.value >= 4:
+            return ("Good", 4)
+        elif self.value >= 2:
+            return ("OK", 3)
+        elif self.value >= 1:
+            return ("Bad", 2)
+        else:
+            return ("Terrible", 1)
+
+
+# src/evaluator.py
+class Evaluator:
+    """
+    Composition class that evaluates multiple NBA metrics.
+    Holds PlayerMetric objects and runs their evaluations.
+    """
+
+    def __init__(self):
+        self._metrics = []  # stores PlayerMetric instances
+
+    def add_metric(self, metric):
+        """
+        Add a metric object into the evaluator.
+        """
+        self._metrics.append(metric)
+
+    def run_all(self):
+        """
+        Runs evaluations for all stored metrics.
+        Returns list of (player, type, text_rating, numeric_rating)
+        """
+        results = []
+        for metric in self._metrics:
+            text_rating, numeric_rating = metric.evaluate()
+            results.append({
+                "player": metric.player_name,
+                "metric": type(metric).__name__,
+                "rating": text_rating,
+                "score": numeric_rating
+            })
+        return results
+
+
+# main.py
+from assists_metric import AssistsMetric, PointGuardAssists, CenterAssists
+from evaluator import Evaluator
+
+def main():
+    evaluator = Evaluator()
+
+    # User inputs (could come from Project 1 functions)
+    evaluator.add_metric(PointGuardAssists("Chris Paul", 8.3))
+    evaluator.add_metric(CenterAssists("Nikola Jokic", 9.2))
+    evaluator.add_metric(AssistsMetric("Klay Thompson", 2.1))
+
+    results = evaluator.run_all()
+
+    for r in results:
+        print(f"{r['player']} - {r['metric']}: {r['rating']} ({r['score']})")
+
+if __name__ == "__main__":
+    main()
+
