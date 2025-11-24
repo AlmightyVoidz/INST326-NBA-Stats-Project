@@ -1,1 +1,7 @@
-
+Here is where we breakdown the structure of Project 3.
+AS you can see AbstractStat is the Parent
+This goes off to 
+ShootingStat 
+ScoringStat
+DefenseStat
+This defines the value 
