@@ -251,3 +251,63 @@ def main():
 if __name__ == "__main__":
     main()
 
+# src/rebounds_metric.py
+
+from player_metric import PlayerMetric
+
+class ReboundsMetric(PlayerMetric):
+    """
+    Base class for evaluating rebounds per game.
+    Applies a general NBA scale for all positions.
+    """
+
+    def evaluate(self):
+        # Standard rebound expectations
+        if self.value >= 12:
+            return ("Excellent", 5)
+        elif self.value >= 8:
+            return ("Good", 4)
+        elif self.value >= 5:
+            return ("OK", 3)
+        elif self.value >= 3:
+            return ("Bad", 2)
+        else:
+            return ("Terrible", 1)
+
+
+class BigManRebounds(ReboundsMetric):
+    """
+    Centers and power forwards are expected to rebound more,
+    so the scale is stricter.
+    """
+
+    def evaluate(self):
+        if self.value >= 14:
+            return ("Excellent", 5)
+        elif self.value >= 10:
+            return ("Good", 4)
+        elif self.value >= 7:
+            return ("OK", 3)
+        elif self.value >= 4:
+            return ("Bad", 2)
+        else:
+            return ("Terrible", 1)
+
+
+class GuardRebounds(ReboundsMetric):
+    """
+    Guards rebound less on average,
+    so this scale is more forgiving.
+    """
+
+    def evaluate(self):
+        if self.value >= 7:
+            return ("Excellent", 5)
+        elif self.value >= 5:
+            return ("Good", 4)
+        elif self.value >= 3:
+            return ("OK", 3)
+        elif self.value >= 2:
+            return ("Bad", 2)
+        else:
+            return ("Terrible", 1)
