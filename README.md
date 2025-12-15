@@ -1,5 +1,9 @@
 # INST326-Team-Project
 
+VIDEO LINK: https://youtu.be/n2U8mc9lXXU
+
+
+
 For Project 2
 This project is basically a mini information-retrieval system built with Python classes.You are able to add documents, and the program automatically builds an inverted index behind the scenes, and then you can search up any term you want.
 On top of that, it can generate reports so you can actually see what’s going on inside the index — top terms, document stats, and much more.
