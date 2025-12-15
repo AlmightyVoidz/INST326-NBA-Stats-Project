@@ -1,11 +1,22 @@
-from src.source import Source
-from src.query import Query
+# tests/test_nba.py
+import unittest
+from models.player_metric import ShootingStat, ScoringStat, DefenseStat, PointGuardAssists, BigManRebounds
 
-# Create example NBA game sources
-game1 = Source("G001", "Lakers vs Celtics", "game", {"points_lakers": 102, "points_celtics": 99})
-game2 = Source("G002", "Bulls vs Heat", "game", {"points_bulls": 110, "points_heat": 105})
+class TestMetrics(unittest.TestCase):
+    def test_shooting_stat(self):
+        self.assertEqual(ShootingStat(65).rate(), "Excellent-5")
+        self.assertEqual(ShootingStat(25).rate(), "Bad-2")
 
-# Create a query to find games where Lakers scored at least 100 points
-query = Query("Q001", "points_lakers", 100)
-results = query.execute([game1, game2])
-print(results)
+    def test_scoring_stat(self):
+        self.assertEqual(ScoringStat(30).rate(), "Good-4")
+        self.assertEqual(ScoringStat(5).rate(), "Terrible-1")
+
+    def test_defense_stat(self):
+        self.assertEqual(DefenseStat(4).rate(), "Excellent-5")
+        self.assertEqual(DefenseStat(0.2).rate(), "Terrible-1")
+
+    def test_assists_pg(self):
+        self.assertEqual(PointGuardAssists("Chris Paul", 10).evaluate(), ("Good", 4))
+
+    def test_rebounds_bigman(self):
+        self.assertEqual(BigManRebounds("Nikola Jokic", 15).evaluate(), ("Excellent", 5))
