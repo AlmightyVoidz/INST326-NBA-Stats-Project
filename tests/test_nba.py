@@ -1,6 +1,6 @@
 # tests/test_nba.py
 import unittest
-from models.player_metric import (
+from src.models.player_metric import (
     ShootingStat,
     ScoringStat,
     DefenseStat,
@@ -9,10 +9,10 @@ from models.player_metric import (
     GuardRebounds,
     BigManRebounds
 )
-from evaluator.evaluator import Evaluator
-from io.importer import import_csv
-from io.exporter import export_csv
-from io.persistence import save_data, load_data
+from src.evaluator.evaluator import Evaluator
+from src.io.importer import import_csv
+from src.io.exporter import export_csv
+from src.io.persistence import save_data, load_data
 from pathlib import Path
 import os
 
