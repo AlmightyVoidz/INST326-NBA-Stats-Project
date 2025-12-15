@@ -1,186 +1,150 @@
-#1
+# models/player_metric.py
+from abc import ABC, abstractmethod
 
-import os
+class AbstractStat(ABC):
+    def __init__(self, value):
+        self.value = value
 
-def extract_file_metadata(file_path):
-    """Get basic info about a file.
-    
-    Args:
-        file_path (str): The location of the file.
-        
-    Returns:
-        dict: Includes name, type, and size in KB.
-    """
-    if not os.path.exists(file_path):
-        raise FileNotFoundError("File does not exist.")
-    
-    file_name = os.path.basename(file_path)
-    file_type = file_name.split(".")[-1]
-    file_size = round(os.path.getsize(file_path) / 1024, 2)
-    
-    return {"name": file_name, "type": file_type, "size_kb": file_size}
+    @abstractmethod
+    def rate(self):
+        pass
 
-#2
-
-def tokenize_text(text):
-    """Break text into lowercase words.
-    
-    Args:
-        text (str): A string of text.
-        
-    Returns:
-        list: List of lowercase words.
-    """
-    if not isinstance(text, str):
-        raise TypeError("Input must be a string.")
-    
-    text = text.lower()
-    words = text.split()
-    return words
-
-#3
-
-def count_word_frequency(words):
-    """Count how many times each word appears.
-    
-    Args:
-        words (list): List of words.
-        
-    Returns:
-        dict: Word counts.
-    """
-    if not isinstance(words, list):
-        raise TypeError("Input must be a list of words.")
-    
-    counts = {}
-    for word in words:
-        if word in counts:
-            counts[word] += 1
+# Shooting, Scoring, Defense Stats
+class ShootingStat(AbstractStat):
+    def rate(self):
+        if self.value >= 60:
+            return "Excellent-5"
+        elif self.value >= 50:
+            return "Good-4"
+        elif self.value >= 40:
+            return "OK-3"
+        elif self.value >= 30:
+            return "Bad-2"
         else:
-            counts[word] = 1
-    return counts
+            return "Terrible-1"
 
-#4
+class ScoringStat(AbstractStat):
+    def rate(self):
+        if self.value >= 35:
+            return "Excellent-5"
+        elif self.value >= 25:
+            return "Good-4"
+        elif self.value >= 15:
+            return "OK-3"
+        elif self.value >= 8:
+            return "Bad-2"
+        else:
+            return "Terrible-1"
 
-def find_keyword_in_text(text, keyword):
-    """Check if a keyword appears in a text.
-    
-    Args:
-        text (str): The text to search.
-        keyword (str): The word to find.
-        
-    Returns:
-        bool: True if found, False if not.
-    """
-    if not all(isinstance(x, str) for x in [text, keyword]):
-        raise TypeError("Both text and keyword must be strings.")
-    
-    return keyword.lower() in text.lower()
-#5
+class DefenseStat(AbstractStat):
+    def rate(self):
+        if self.value >= 3.5:
+            return "Excellent-5"
+        elif self.value >= 2:
+            return "Good-4"
+        elif self.value >= 1:
+            return "OK-3"
+        elif self.value >= 0.5:
+            return "Bad-2"
+        else:
+            return "Terrible-1"
 
-def make_snippet(text, keyword):
-    """Make a short snippet showing where the keyword appears.
-    
-    Args:
-        text (str): Full text.
-        keyword (str): Word to highlight.
-        
-    Returns:
-        str: Short snippet with keyword in the middle.
-    """
-    text_lower = text.lower()
-    index = text_lower.find(keyword.lower())
-    
-    if index == -1:
-        return text[:60] + "..." if len(text) > 60 else text
-    
-    start = max(0, index - 20)
-    end = min(len(text), index + len(keyword) + 20)
-    snippet = text[start:end]
-    return f"...{snippet}..."
+# Assists
+class PlayerMetric(ABC):
+    def __init__(self, player_name, value):
+        self._player_name = player_name
+        self._value = value
 
-#6
+    @property
+    def player_name(self):
+        return self._player_name
 
-import re
+    @property
+    def value(self):
+        return self._value
 
-def clean_text(text: str) -> str:
-    """This cleans strings by removing punctuation and making it lowercase."""
-    if not isinstance(text, str):
-        raise TypeError("Text must be a string")
-    cleaned = re.sub(r'[^a-zA-Z\s]', '', text)
-    return cleaned.lower().strip()
+    @abstractmethod
+    def evaluate(self):
+        pass
 
-#7
+class AssistsMetric(PlayerMetric):
+    def evaluate(self):
+        if self.value >= 10:
+            return ("Excellent", 5)
+        elif self.value >= 7:
+            return ("Good", 4)
+        elif self.value >= 5:
+            return ("OK", 3)
+        elif self.value >= 3:
+            return ("Bad", 2)
+        else:
+            return ("Terrible", 1)
 
-def tokenize(text: str) -> list[str]:
-    """ This Splits different texts into words."""
-    if not isinstance(text, str):
-        raise TypeError("Text must be a string")
-    return clean_text(text).split()
+class PointGuardAssists(AssistsMetric):
+    def evaluate(self):
+        if self.value >= 11:
+            return ("Excellent", 5)
+        elif self.value >= 8:
+            return ("Good", 4)
+        elif self.value >= 6:
+            return ("OK", 3)
+        elif self.value >= 4:
+            return ("Bad", 2)
+        else:
+            return ("Terrible", 1)
 
-#8
+class CenterAssists(AssistsMetric):
+    def evaluate(self):
+        if self.value >= 6:
+            return ("Excellent", 5)
+        elif self.value >= 4:
+            return ("Good", 4)
+        elif self.value >= 2:
+            return ("OK", 3)
+        elif self.value >= 1:
+            return ("Bad", 2)
+        else:
+            return ("Terrible", 1)
 
-from collections import Counter
+# Rebounds
+class ReboundsMetric(PlayerMetric):
+    def evaluate(self):
+        if self.value >= 12:
+            return ("Excellent", 5)
+        elif self.value >= 8:
+            return ("Good", 4)
+        elif self.value >= 5:
+            return ("OK", 3)
+        elif self.value >= 3:
+            return ("Bad", 2)
+        else:
+            return ("Terrible", 1)
 
-def word_frequency(text: str) -> dict[str, int]:
-    """Counts how often each word appears."""
-    if not isinstance(text, str):
-        raise TypeError("Text must be a string")
-    words = tokenize(text)
-    return dict(Counter(words))
+class BigManRebounds(ReboundsMetric):
+    def evaluate(self):
+        if self.value >= 14:
+            return ("Excellent", 5)
+        elif self.value >= 10:
+            return ("Good", 4)
+        elif self.value >= 7:
+            return ("OK", 3)
+        elif self.value >= 4:
+            return ("Bad", 2)
+        else:
+            return ("Terrible", 1)
 
-#9
+class GuardRebounds(ReboundsMetric):
+    def evaluate(self):
+        if self.value >= 7:
+            return ("Excellent", 5)
+        elif self.value >= 5:
+            return ("Good", 4)
+        elif self.value >= 3:
+            return ("OK", 3)
+        elif self.value >= 2:
+            return ("Bad", 2)
+        else:
+            return ("Terrible", 1)
 
-def search_documents(query: str, documents: list[str]) -> list[int]:
-    """Find which documents contain a given query term."""
-    if not isinstance(query, str):
-        raise TypeError("Query must be a string")
-    if not isinstance(documents, list):
-        raise TypeError("Documents must be a list of strings")
-    
-    query = query.lower()
-    found = []
-    for i, doc in enumerate(documents):
-        if query in clean_text(doc):
-            found.append(i)
-    return found
 
-#10
 
-def highlight_term(text: str, term: str) -> str:
-    """Highlights a word in text by surrounding it with brackets."""
-    if not all(isinstance(i, str) for i in [text, term]):
-        raise TypeError("Both inputs must be strings")
-    pattern = re.compile(rf'\b{term}\b', re.IGNORECASE)
-    return pattern.sub(f'[{term.upper()}]', text)
-
-def average_word_length(text: str) -> float:
-    """Compute average word length in text."""
-    if not text.strip():
-        return 0
-    if not isinstance(text, str):
-        raise TypeError("Input must be a string")
-    words = text.split()
-    if not words:
-        return 0.0
-    return sum(len(w) for w in words) / len(words)
-
-def clean_text(text: str) -> str:
-    """Trim spaces and lowercase text."""
-    if not isinstance(text, str):
-        raise TypeError("Input must be a string")
-    return " ".join(text.strip().lower().split())
-
-def contains_keyword(text: str, keyword: str) -> bool:
-    """Check if keyword appears in text (case-insensitive)."""
-    if not isinstance(text, str) or not isinstance(keyword, str):
-        raise TypeError("Both inputs must be strings")
-    return keyword.lower() in text.lower()
-
-def summarize_text(text: str, limit: int = 10) -> str:
-    """Return the first `limit` words of text."""
-    if not isinstance(text, str):
-        raise TypeError("Text must be a string")
-    if not isinstance(limit, int) or limit <= 0:
-        raise ValueError("Limit must be a positive integer")
-    return " ".join(text.split()[:limit])
