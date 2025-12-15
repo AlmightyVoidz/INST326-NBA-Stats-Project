@@ -19,3 +19,21 @@ Blocks/Steals Per Game
 Assists Per Game 
 
 Rebounds Per Game
+
+For Project 4
+This Project is out final project that delivers a NBA Player Stat Analsis system fully build on Object-Oriented Programming (OOP) Principles. We leverage Template method design, and polymorphism to provide Position Specifc ratings for their statitics.
+Also The application begings by ingesting player data from a CSV file In our case (nba_2024_stats.CSV). For Each Players
+
+Points Per Game
+
+Shooting Percentage
+
+Blocks/Steals Per Game
+
+Assists Per Game 
+
+Rebounds Per Game
+
+These all go into the classes such as for example PointGuardAssists OR CenterAssists
+
+All these specialized classes inherit from a common Abstract Base Class (PlayerMetric) ensuring a good interface. This analysis is made by our Evaluator class which runs polymorphic methods.
