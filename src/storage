@@ -1,1 +1,39 @@
+import json
 
+def save_state(data, filename="data/system_state.json"):
+    with open(filename, "w") as f:
+        json.dump(data, f, indent=2)
+
+def load_state(filename="data/system_state.json"):
+    try:
+        with open(filename, "r") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return []
+
+import csv
+
+def import_csv(filepath="data/sample_nba.csv"):
+    players = []
+    with open(filepath, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            players.append({
+                "player": row["Player"],
+                "position": row["Position"],
+                "assists": float(row["Assists"]),
+                "rebounds": float(row["Rebounds"]),
+                "points": float(row["Points"]),
+                "shooting": float(row["Shooting"])
+            })
+    return players
+
+import csv
+
+def export_csv(results, filepath="data/top_players.csv"):
+    fieldnames = ["player", "metric", "rating", "score"]
+    with open(filepath, "w", newline="") as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for r in results:
+            writer.writerow(r)
